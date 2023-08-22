@@ -14,9 +14,10 @@ def rfnow():
     current_time = datetime.datetime.now()
     print(f'\x1b[31m[{current_time}] \x1b[0m', end='')
 def data_dividing(a, m):
+    data = []
+    temp = []
     try:
         n = len(a) // m
-        data = []
         for i in range(m):
             data.append([])
         for i in range(m):
