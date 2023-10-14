@@ -1,34 +1,19 @@
 import os
-import datetime
-from time import *
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-import requests
 import threading
-def fnow():
-    current_time = datetime.datetime.now()
-    print(f'\x1b[94m[{current_time}] \x1b[0m', end='')
-def rfnow():
-    current_time = datetime.datetime.now()
-    print(f'\x1b[31m[{current_time}] \x1b[0m', end='')
-def data_dividing(a, m):
-    data = []
-    temp = []
-    try:
-        n = len(a) // m
-        for i in range(m):
-            data.append([])
-        for i in range(m):
-            data[i] = a[:n+1]
-            del a[:n+1]
-    except:
-        temp = a
-    if a != []:
-        temp = a
-    return data, temp
-def download(list_url):
+from func import *
+banner = '''
+ ███████████ █████ █████   ████ ██████████ █████ █████ ███████████
+░█░░░███░░░█░░███ ░░███   ███░ ░░███░░░░░█░░███ ░░███ ░█░░░███░░░█
+░   ░███  ░  ░███  ░███  ███    ░███  █ ░  ░░███ ███  ░   ░███  ░ 
+    ░███     ░███  ░███████     ░██████     ░░█████       ░███    
+    ░███     ░███  ░███░░███    ░███░░█      ███░███      ░███    
+    ░███     ░███  ░███ ░░███   ░███ ░   █  ███ ░░███     ░███    
+    █████    █████ █████ ░░████ ██████████ █████ █████    █████   
+   ░░░░░    ░░░░░ ░░░░░   ░░░░ ░░░░░░░░░░ ░░░░░ ░░░░░    ░░░░░      v1.0   
+                                                                  
+                                    Author: t.me/blackfox2006/
+'''
+def download(list_url, num):
     global count
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
@@ -57,37 +42,51 @@ def download(list_url):
             with open(name, 'wb') as f:
                 f.write(data.content)
                 fnow()
-                print(f'\x1b[32mĐã tải thành công {url} ==> {name}!\x1b[0m [{count}/{total}]')
+                print(f'\x1b[32mTHREAD {num} : Đã tải thành công {url} ==> {name}!\x1b[0m [{count}/{total}]')
                 count += 1
             f.close()
         except:
             rfnow()
-            print(f'\x1b[31mLink \x1b[32m{url}\x1b[31m bị lỗi!\x1b[0m')
+            print(f'\x1b[31mTHREAD {num} : Link \x1b[32m{url}\x1b[31m bị lỗi!\x1b[0m')
     driver.close()
 if __name__ == '__main__':
-    with open('links.txt', 'r') as f:
-        links = f.readlines()
-    links = [i.replace('\n', '') for i in links]
-    total = len(links)
-    num_threads = int(input('Threads : '))
-    data, temp= data_dividing(links, num_threads)
-    count = 1
-    threads = []
-    for i in range(num_threads):
-        threads.append(threading.Thread(target=download, args=(data[i],)))
-    for i in threads:
-        i.start()
-    for i in threads:
-        i.join()
-    while True:
-        if len(temp) % num_threads == 0:
-            data, temp = data_dividing(temp, num_threads)
-            for i in range(num_threads):
-                threads.append(threading.Thread(target=download, args=(data[i],)))
-            for i in threads:
-                i.start()
+    print(f'\x1b[36m{banner}\n\n')
+    print('1. Tải hàng loạt video Tiktok (link trong links.txt) \n2. Lọc video Beta Tiktok ')
+    choice = int(input('Mode : '))
+    if choice == 1:
+        with open('links.txt', 'r') as f:
+            links = f.readlines()
+        links = [i.replace('\n', '') for i in links]
+        total = len(links)
+        num_threads = int(input('Threads : '))
+        data, temp = data_dividing(links, num_threads)
+        count = 1
+        threads = []
+        for i in range(num_threads):
+            threads.append(threading.Thread(target=download, args=(data[i], i+1,)))
+        for i in threads:
+            i.start()
+        for i in threads:
+            i.join()
+        download(temp, 1)
+        print(f'Successful downloads : {count}')
+    elif choice == 2:
+        path = input('Video folder path: ')
+        if not os.path.exists(path):
+            print(f'Not found {path}!')
+            exit(-1)
+        else:
+            os.chdir(path)
+            files = os.listdir()
+            for i in files:
+                if not i.endswith('mp4'):
+                    files.remove(i)
+            data, temp = data_dividing(files, 10)
+            threads = []
+            for i in range(10):
+                threads.append(threading.Thread(target=beta, args=(data[i], i+1,)))
+            for i in range(10):
+                threads[i].start()
             for i in threads:
                 i.join()
-        else:
-            num_threads -= 1
-    print(f'successful downloads : {count}')
+            beta(temp, 1)
