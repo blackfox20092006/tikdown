@@ -11,7 +11,7 @@ banner = '''
     █████    █████ █████ ░░████ ██████████ █████ █████    █████   
    ░░░░░    ░░░░░ ░░░░░   ░░░░ ░░░░░░░░░░ ░░░░░ ░░░░░    ░░░░░      v1.0   
                                                                   
-                                    Author: t.me/blackfox2006/
+                                    Author: https://www.facebook.com/quangnhan2o6
 '''
 def download(list_url, num):
     global count
